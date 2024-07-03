@@ -41,7 +41,7 @@ def parse_arguments():
             help="Start day in the form YYYY-MM-DD", required=False)
     parser.add_argument("-e","--endday",dest="endday",
             help="End day in the form YYYY-MM-DD", required=False)
-    parser.add_argument("-t","--type",dest="stationtype",
+    parser.add_argument("-t","--type",dest="stationtype", # REMOVE_ME: needs to be changed to 'ship' and 'buoy'
             help="Choose between block, wigos or radio", required=True)
     parser.add_argument("-i", "--init", dest="initialize",
             help="Download all data", required=False, action="store_true")
@@ -216,9 +216,10 @@ def bufr_2_json(file):
 
 def return_list_of_stations(get_files):
     cfg = parse_cfg(parse_arguments().cfgfile)
-    stationtype = parse_arguments().stationtype
+    stationtype = parse_arguments().stationtype 
+
     stations = []
-    
+    # REMOVE_ME: station types do not match arg pars options
     if stationtype == 'ship':
         for one_file in get_files:
             simple_file = bufr_2_json(one_file)
@@ -236,13 +237,14 @@ def return_list_of_stations(get_files):
                     if station_num not in stations:
                         stations.append(station_num)
 
-    return stations
+    return stations # REMOVE_ME: stations is NOT empty here 
 
 def sorting_hat(get_files, stations = 1):
     cfg = parse_cfg(parse_arguments().cfgfile)
     
     if not parse_arguments().spec_station and stations == 1:
-        stations = return_list_of_stations(get_files)
+        print('In "if not" block of sorting_hat()') # REMOVE_ME:
+        stations = return_list_of_stations(get_files) # REMOVE_ME: get filehas list of paths, but statios is empty      !UPDATE: now not empty
     elif parse_arguments().spec_station and stations == 1:
         stations = parse_arguments().spec_station
         
@@ -251,7 +253,7 @@ def sorting_hat(get_files, stations = 1):
     for one_file in get_files:
         simple_file = bufr_2_json(one_file)
         for station in simple_file:
-            if str(station[0]['value']) in stations:
+            if str(station[0]['value']) in stations: # REMOVE_ME: so far so good until here
                 stations_dict['{}'.format(str(station[0]['value']))].append(station)
     
     print('bufr successfully converted to json')
@@ -276,8 +278,11 @@ def shipOrMobileLandStationIdentifier(msg):
         #save a table with units for later use
         units_df = df
         units_df = units_df.drop(columns=['value'])
-        cols = pd.io.parsers.base_parser.ParserBase({'names':units_df['key'], 'usecols':None})._maybe_dedup_names(units_df['key'])
-        units_df['key'] = cols # will add a ".1",".2" etc for each double name
+        # print(units_df) # REMOVE_ME: 
+        # cols = pd.io.parsers.base_parser.ParserBase({'names':units_df['key'], 'usecols':None})._maybe_dedup_names(units_df['key'])
+        # print(cols) # REMOVE_ME: 
+        # stop() # REMOVE_ME: 
+        # units_df['key'] = cols # will add a ".1",".2" etc for each double name
 
         #save a table with height of measurement for later use
         height_df = pd.DataFrame(height_copy)
@@ -285,8 +290,8 @@ def shipOrMobileLandStationIdentifier(msg):
             height_df['height_numb'] = [str(val.get('value')) + ' ' + str(val.get('units')) for val in height_df.height]
             height_df['height_type'] = [str(val.get('key')) for val in height_df.height]
             height_df = height_df.drop(columns=['height'])
-            cols = pd.io.parsers.base_parser.ParserBase({'names':height_df['key'], 'usecols':None})._maybe_dedup_names(height_df['key'])
-            height_df['key'] = cols # will add a ".1",".2" etc for each double name
+            # cols = pd.io.parsers.base_parser.ParserBase({'names':height_df['key'], 'usecols':None})._maybe_dedup_names(height_df['key'])
+            # height_df['key'] = cols # will add a ".1",".2" etc for each double name
             height_df = height_df.reset_index()
         except:
             height_df = height_df  
@@ -296,8 +301,8 @@ def shipOrMobileLandStationIdentifier(msg):
         try:
             time_df['time_duration'] = [str(abs(val.get('value'))) + ' ' + str(val.get('units')) for val in time_df.time]
             time_df = time_df.drop(columns=['time'])
-            cols = pd.io.parsers.base_parser.ParserBase({'names':time_df['key'], 'usecols':None})._maybe_dedup_names(time_df['key'])
-            time_df['key'] = cols # will add a ".1",".2" etc for each double name
+            # cols = pd.io.parsers.base_parser.ParserBase({'names':time_df['key'], 'usecols':None})._maybe_dedup_names(time_df['key'])
+            # time_df['key'] = cols # will add a ".1",".2" etc for each double name
             time_df = time_df.reset_index()
         except:
             time_df = time_df
@@ -309,8 +314,8 @@ def shipOrMobileLandStationIdentifier(msg):
         df = df.set_index(['time'])
 
         #some columnnames repeat itself, creating problems when changing to xarray. Fix with:
-        cols = pd.io.parsers.base_parser.ParserBase({'names':df.columns, 'usecols':None})._maybe_dedup_names(df.columns)
-        df.columns = cols # will add a ".1",".2" etc for each double name
+        # cols = pd.io.parsers.base_parser.ParserBase({'names':df.columns, 'usecols':None})._maybe_dedup_names(df.columns)
+        # df.columns = cols # will add a ".1",".2" etc for each double name
         df = df.drop(columns=['key', 'year', 'month', 'day', 'hour', 'minute'])
     
         gathered_df.append(df)
@@ -634,9 +639,9 @@ def buoyOrPlatformIdentifier(msg):
             df_vals = df_vals.drop(columns = ['key','year', 'month', 'day','hour', 'minute'])
             
         df_vals = df_vals.set_index('time')
-        cols = pd.io.parsers.base_parser.ParserBase({'names':df_vals.columns, 'usecols':None})._maybe_dedup_names(df_vals.columns)
+        # cols = pd.io.parsers.base_parser.ParserBase({'names':df_vals.columns, 'usecols':None})._maybe_dedup_names(df_vals.columns)
 
-        df_vals.columns = cols # will add a ".1",".2" etc for each double name
+        # df_vals.columns = cols # will add a ".1",".2" etc for each double name
         for column in df_vals.columns:
             try:
                 df_vals[column] = pd.to_numeric(df_vals[column])
@@ -658,8 +663,8 @@ def buoyOrPlatformIdentifier(msg):
                 continue
         new_unit = new_unit.transpose()
         new_unit = new_unit.reset_index().rename(columns={'index':'key'})
-        cols = pd.io.parsers.base_parser.ParserBase({'names':new_unit['key'], 'usecols':None})._maybe_dedup_names(new_unit['key'])
-        new_unit['key'] = cols # will add a ".1",".2" etc for each double name
+        # cols = pd.io.parsers.base_parser.ParserBase({'names':new_unit['key'], 'usecols':None})._maybe_dedup_names(new_unit['key'])
+        # new_unit['key'] = cols # will add a ".1",".2" etc for each double name
         df_units.append(new_unit)
 
         
