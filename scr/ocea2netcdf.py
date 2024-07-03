@@ -379,7 +379,7 @@ def shipOrMobileLandStationIdentifier(msg):
         var = variable
         if variable[-2] == '.':
             var = variable[:-2]
-        change_upper_case = re.sub('(?<!^)(?=\d{2})', '_',re.sub('(?<!^)(?=[A-Z])', '_', var)).lower()
+        change_upper_case = re.sub(r'(?<!^)(?=\d{2})', '_',re.sub(r'(?<!^)(?=[A-Z])', '_', var)).lower()
         
         
         
@@ -709,7 +709,7 @@ def buoyOrPlatformIdentifier(msg):
         var = variable
         if variable[-2] == '.':
             var = variable[:-2]
-        change_upper_case = re.sub('(?<!^)(?=\d{2})', '_',re.sub('(?<!^)(?=[A-Z])', '_', var)).lower()
+        change_upper_case = re.sub(r'(?<!^)(?=\d{2})', '_',re.sub(r'(?<!^)(?=[A-Z])', '_', var)).lower()
         
         # checking for standardname
         standardname_check = cf_match(change_upper_case)
