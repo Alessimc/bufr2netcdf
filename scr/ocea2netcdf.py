@@ -142,11 +142,10 @@ def get_files_initialize(desired_path):
 
 
 def bufr_2_json(file):
-    
-    #open bufr file, convert to json (using "-j s") and load it with json.loads
 
+    #open bufr file, convert to json (using "-j s") and load it with json.loads
     json_file = json.loads(subprocess.check_output(r"bufr_dump -j f {}".format(file), shell=True))
-    
+
    
     # sorting so that each subset is a list of dictionary
     count = 0
@@ -891,8 +890,9 @@ if __name__ == "__main__":
             elif parse.stationtype == 'ship':
                 try: # REMOVE_ME: 
                     file = shipOrMobileLandStationIdentifier(sorted_files['{}'.format(key)])          
+                    # works for station IDs with letters 
                 except:
-                    print(key)
+                    print(key) # prints all stations where creating file fails.
                     continue
             # sys.exit()
             print('gett past this though')
