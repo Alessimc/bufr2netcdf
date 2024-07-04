@@ -864,15 +864,14 @@ def saving_grace(file, key, destdir):
         bad_time = ds_dictio['coords']['time']['data']
         ds_dictio['coords']['time']['data'] = np.array([((ti - datetime(1970,1,1)).total_seconds()) for ti in bad_time]).astype('i4')
         for i in coords:
-            print(i)
-            print(ds_dictio['coords'][i]['data'])
+            # print(i)
+            # print(ds_dictio['coords'][i]['data'])
             ds_dictio['coords'][i]['data'] = np.float32(ds_dictio['coords'][i]['data'])
         all_ds_station_period = xr.Dataset.from_dict(ds_dictio)
         
         all_ds_station_period = all_ds_station_period.fillna(-9999)
         all_ds_station_period.to_netcdf('{}/ocea_{}_{}-{}.nc'.format(destdir, key, timestring1, timestring2),
                                             engine='netcdf4', encoding=set_encoding(all_ds_station_period))
-        stop()
 
 if __name__ == "__main__":
     parse = parse_arguments()
@@ -884,13 +883,19 @@ if __name__ == "__main__":
     if parse.initialize:
         print('initialization has begun')
         sorted_files = sorting_hat(get_files_initialize(frompath))
-        print('sorting hat done here')
+
         for key, val in sorted_files.items():
+            
             if parse.stationtype == 'buoy':
                 file = buoyOrPlatformIdentifier(sorted_files['{}'.format(key)])
             elif parse.stationtype == 'ship':
-                file = shipOrMobileLandStationIdentifier(sorted_files['{}'.format(key)])
+                try: # REMOVE_ME: 
+                    file = shipOrMobileLandStationIdentifier(sorted_files['{}'.format(key)])          
+                except:
+                    print(key)
+                    continue
             # sys.exit()
+            print('gett past this though')
             saving = saving_grace(file, key, destdir)
         
                
