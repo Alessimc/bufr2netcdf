@@ -347,8 +347,7 @@ def shipOrMobileLandStationIdentifier(msg):
         time_df = gathered_df_time[0]
     
     if len(gathered_df) > 1:
-        # REMOVE_ME: try to ignore indexes so all are unique for concat
-        main_df = pd.concat(gathered_df, ignore_index=True)
+        main_df = pd.concat(gathered_df)
     else:
         main_df = gathered_df[0]
         
@@ -873,6 +872,7 @@ def saving_grace(file, key, destdir):
         all_ds_station_period = all_ds_station_period.fillna(-9999)
         all_ds_station_period.to_netcdf('{}/ocea_{}_{}-{}.nc'.format(destdir, key, timestring1, timestring2),
                                             engine='netcdf4', encoding=set_encoding(all_ds_station_period))
+        stop()
 
 if __name__ == "__main__":
     parse = parse_arguments()
