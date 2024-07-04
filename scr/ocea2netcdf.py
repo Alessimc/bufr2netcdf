@@ -237,7 +237,7 @@ def return_list_of_stations(get_files):
                     if station_num not in stations:
                         stations.append(station_num)
 
-    return stations # REMOVE_ME: stations is NOT empty here 
+    return stations
 
 def sorting_hat(get_files, stations = 1):
     cfg = parse_cfg(parse_arguments().cfgfile)
@@ -261,12 +261,15 @@ def sorting_hat(get_files, stations = 1):
     
     return stations_dict
 
+def stationOrSiteName():
+    return 0
+
 def shipOrMobileLandStationIdentifier(msg):
     gathered_df = []
     gathered_df_units = []
     gathered_df_height = []
     gathered_df_time = []
-    
+
     for i in msg:
 
         height_copy = copy_dict(i,'key','height')
@@ -344,7 +347,8 @@ def shipOrMobileLandStationIdentifier(msg):
         time_df = gathered_df_time[0]
     
     if len(gathered_df) > 1:
-        main_df = pd.concat(gathered_df)
+        # REMOVE_ME: try to ignore indexes so all are unique for concat
+        main_df = pd.concat(gathered_df, ignore_index=True)
     else:
         main_df = gathered_df[0]
         
@@ -537,8 +541,8 @@ def shipOrMobileLandStationIdentifier(msg):
     main_ds.attrs['license'] = cfg['author']['License']
 
     # this didnt work when I had it further up in the code :-) why?????
-    main_ds = main_ds.assign({'trajectory': (('name_strlen'),np.array([shipOrMobileLandStationIdentifier]))})
-
+    # main_ds = main_ds.assign({'trajectory': (('name_strlen'),np.array([shipOrMobileLandStationIdentifier]))}) # REMOVE_ME; just assigning the shipOrMobileLandStationIdentifier function???
+    main_ds = main_ds.assign({'trajectory': 0}) # REMOVE_ME: testing to debug
     return main_ds
 
 
@@ -880,12 +884,13 @@ if __name__ == "__main__":
     if parse.initialize:
         print('initialization has begun')
         sorted_files = sorting_hat(get_files_initialize(frompath))
+        print('sorting hat done here')
         for key, val in sorted_files.items():
             if parse.stationtype == 'buoy':
                 file = buoyOrPlatformIdentifier(sorted_files['{}'.format(key)])
             elif parse.stationtype == 'ship':
                 file = shipOrMobileLandStationIdentifier(sorted_files['{}'.format(key)])
-            sys.exit()
+            # sys.exit()
             saving = saving_grace(file, key, destdir)
         
                
